@@ -1,13 +1,11 @@
 import express from 'express';
-import bodyParser from 'body-parser';
+// import bodyParser from 'body-parser';
 
 const FRONT_END_ROOT = '/pwa';
 const FRONT_END_DIR = './pwa';
 const app = express();
-// create application/json parser
-const jsonParser = bodyParser.json();
-// parse various different custom JSON types as JSON
-app.use(bodyParser.json({ type: 'application/*+json' }));
+
+// handle CORS for static webserver
 app.use((req, res, next) => {
   if (req.url.indexOf(FRONT_END_ROOT) !== -1) {
     res.header('Access-Control-Allow-Origin', '*');
@@ -19,14 +17,14 @@ app.use(FRONT_END_ROOT, express.static(FRONT_END_DIR));
 
 const SERVER_PORT = '8080'
 console.log('Starting server...');
-app.post('/', (req, res) => {
-  const { body, method } = req;
-  console.log({ body, method });
-  // res.setHeader('Content-Type', 'application/json');
-  // res.sendStatus(200);
-  res.send(JSON.stringify({
-    header: true,
-  }));
+app.post('/api', express.json(), (req, res) => {
+  const { body, method, headers } = req;
+  console.log({ body, method, headers });
+  res.setHeader('Content-Type', 'application/json');
+  res.status(200);
+  res.send({
+    syncComplete: true,
+  });
 });
 
 app.listen(SERVER_PORT, () => {
