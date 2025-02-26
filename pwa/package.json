@@ -1,0 +1,7 @@
+{
+  "name": "basic-pwa",
+  "version": "1.0.0",
+  "description": "This is a basic PWA to demonstrate the PWA's offline sync capabilities",
+  "main": "index.js",
+  "license": "MIT"
+}
