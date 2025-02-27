@@ -18,16 +18,18 @@ self.addEventListener('install', event => {
   })());
 });
 
-self.addEventListener('message', async (event) => {
-  if (event.data.type === 'TRIGGER_SYNC') {
+async function processSync() {
+  await createDB();
+  const unsynchronizedRecords = await getUnsynchronizedRecords();
+  console.log({ unsynchronizedRecords });
+  await saveBodyForSync(unsynchronizedRecords);
+}
+self.addEventListener('sync', event => {
+  if (event.tag === 'TRIGGER_SYNC') {
     console.log('message received by service worker');
-    await createDB();
-    const unsynchronizedRecords = await getUnsynchronizedRecords();
-    console.log({ unsynchronizedRecords });
-    await saveBodyForSync(unsynchronizedRecords);
+    event.waitUntil(processSync());
   }
 });
-
 
 
 async function saveBodyForSync(dataToPost) {

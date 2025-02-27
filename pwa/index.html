@@ -35,7 +35,9 @@
       wb.register();
       syncButton.addEventListener("click", async () => {
         console.log('triggering sync');
-        await wb.messageSW({ type: 'TRIGGER_SYNC' });
+        const registration = await navigator.serviceWorker.ready;
+        await registration.sync.register('TRIGGER_SYNC');
+        // await wb.messageSW({ type: 'TRIGGER_SYNC' });
       });
 
     }
