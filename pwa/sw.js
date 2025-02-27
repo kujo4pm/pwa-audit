@@ -1,4 +1,9 @@
+import { createDB, getUnsynchronizedRecords } from './database.js';
 const CACHE_NAME = `temperature-converter-v1`;
+const HOST_NAME = '127.0.0.1';
+const SERVER_PORT = '8080';
+const API_PATH = 'api';
+const SW_VERSION = '1.0.0';
 
 // Use the install event to pre-cache all initial resources.
 self.addEventListener('install', event => {
@@ -13,6 +18,33 @@ self.addEventListener('install', event => {
   })());
 });
 
+self.addEventListener('message', async (event) => {
+  if (event.data.type === 'TRIGGER_SYNC') {
+    console.log('message received by service worker');
+    await createDB();
+    const unsynchronizedRecords = await getUnsynchronizedRecords();
+    console.log({ unsynchronizedRecords });
+    await saveBodyForSync(unsynchronizedRecords);
+  }
+});
+
+
+
+async function saveBodyForSync(dataToPost) {
+  try {
+    const response = await fetch(`http://${HOST_NAME}:${SERVER_PORT}/${API_PATH}`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      // send JSON data
+      body: JSON.stringify(dataToPost),
+    });
+    console.log(await response.json());
+  } catch (e) {
+    console.error(e);
+  }
+}
 self.addEventListener('fetch', event => {
   event.respondWith((async () => {
     const cache = await caches.open(CACHE_NAME);

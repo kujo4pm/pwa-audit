@@ -23,10 +23,24 @@
     <button type="button" id="sync" class="btn btn-primary btn-sm">Attempt Sync</button>
     <output name="output-message" id="output-message" for="input-temp input-unit output-unit">Press button</output>
   </form>
+  <script type="module" src="database.js"></script>
   <script type="module" src="formHandler.js"></script>
-  <script>
+  <script type="module">
+    import { Workbox } from 'https://storage.googleapis.com/workbox-cdn/releases/6.4.1/workbox-window.prod.mjs';
+    // import { getData, createDB, addData } from './database.js';
+
+
+    const syncButton = document.getElementById('sync');
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js', { scope: '/' });
+      const wb = new Workbox('sw.js', {
+        type: 'module',
+      });
+      wb.register();
+      syncButton.addEventListener("click", async () => {
+        console.log('triggering sync');
+        await wb.messageSW({ type: 'TRIGGER_SYNC' });
+      });
+
     }
   </script>
 </body>
