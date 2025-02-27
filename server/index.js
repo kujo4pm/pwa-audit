@@ -19,7 +19,7 @@ const SERVER_PORT = '8080'
 console.log('Starting server...');
 app.post('/api', express.json(), (req, res) => {
   const { body, method, headers } = req;
-  console.log({ body, method, headers });
+  console.log({ method, body });
   res.setHeader('Content-Type', 'application/json');
   res.status(200);
   res.send({

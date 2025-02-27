@@ -18,16 +18,19 @@ async function createDB() {
             keyPath: 'id'
           });
           // Create an index called `name` based on the `type` property of objects in the store
-          store.createIndex('type', 'type');
+          store.createIndex('IsSynchronized', 'isSynchronized', { unique: false });
       }
     }
   });
 }
 
-async function addData(fhirPatient) {
+async function saveRecord(record) {
   const tx = await db.transaction(SYNC_QUEUE_TABLE, "readwrite");
   const store = tx.objectStore(SYNC_QUEUE_TABLE);
-  store.add(fhirPatient);
+  console.log({
+    savingRecord: record,
+  });
+  store.add(record);
   await tx.done;
 }
 
@@ -38,10 +41,14 @@ async function getUnsynchronizedRecords() {
   // Because in our case the `id` is the key, we would
   // have to know in advance the value of the id to
   // retrieve the record
-  const value = await store.get('example_1740648580874');
-  const unsynchronized = await store.getAll();
+  // const value = await store.get('example_1740648580874');
+  const unsynchronizedRecordsIndex = store.index('IsSynchronized');
+  const range = IDBKeyRange.only(0);
+  // const cursorRequest = vendorIndex.openCursor(range);
+  const unsynchronized = await unsynchronizedRecordsIndex.getAll(range);
+  console.log({ unsynchronized });
   return unsynchronized;
 }
 
 
-export { getUnsynchronizedRecords, createDB, addData };
+export { getUnsynchronizedRecords, createDB, saveRecord };

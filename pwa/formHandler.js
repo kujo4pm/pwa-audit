@@ -1,4 +1,4 @@
-import { createDB, addData } from './database.js';
+import { createDB, saveRecord } from './database.js';
 
 
 
@@ -14,8 +14,12 @@ async function saveText() {
   try {
     const fhirPatientJSON = JSON.parse(inputData);
     fhirPatientJSON.id = `${fhirPatientJSON.id}_${Date.now()}`;
-    console.log(fhirPatientJSON);
-    await addData(fhirPatientJSON);
+    const recordToSave = {
+      payload: fhirPatientJSON,
+      id: fhirPatientJSON.id,
+      isSynchronized: 0,
+    };
+    await saveRecord(recordToSave);
     showResult(`Patient ${fhirPatientJSON.id} added to the database`);
   }
   catch (e) {

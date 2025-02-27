@@ -27,9 +27,6 @@
   <script type="module" src="formHandler.js"></script>
   <script type="module">
     import { Workbox } from 'https://storage.googleapis.com/workbox-cdn/releases/6.4.1/workbox-window.prod.mjs';
-    // import { getData, createDB, addData } from './database.js';
-
-
     const syncButton = document.getElementById('sync');
     if ('serviceWorker' in navigator) {
       const wb = new Workbox('sw.js', {
