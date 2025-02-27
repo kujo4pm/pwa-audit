@@ -1,6 +1,6 @@
 import { createDB, getUnsynchronizedRecords } from './database.js';
 const CACHE_NAME = `temperature-converter-v1`;
-const HOST_NAME = '127.0.0.1';
+const HOST_NAME = 'localhost';
 const SERVER_PORT = '8080';
 const API_PATH = 'api';
 const SW_VERSION = '1.0.0';
@@ -18,16 +18,34 @@ self.addEventListener('install', event => {
   })());
 });
 
-async function processSync() {
+async function sendUnsynchronized() {
   await createDB();
   const unsynchronizedRecords = await getUnsynchronizedRecords();
   console.log({ unsynchronizedRecords });
   await saveBodyForSync(unsynchronizedRecords);
 }
+
+async function fetchRecordsFromServer() {
+  try {
+    const response = await fetch(`http://${HOST_NAME}:${SERVER_PORT}/${API_PATH}/patient`);
+    console.log(await response.json());
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 self.addEventListener('sync', event => {
   if (event.tag === 'TRIGGER_SYNC') {
     console.log('message received by service worker');
-    event.waitUntil(processSync());
+    event.waitUntil(sendUnsynchronized());
+  }
+});
+
+self.addEventListener('periodicsync', event => {
+  console.log('Running periodic sync');
+  if (event.tag === 'PERIODIC_SYNC') {
+    // event.waitUntil(Promise.all(sendUnsynchronized(), fetchRecordsFromServer()));
+    event.waitUntil(fetchRecordsFromServer());
   }
 });
 

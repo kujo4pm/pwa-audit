@@ -29,6 +29,7 @@
     import { Workbox } from 'https://storage.googleapis.com/workbox-cdn/releases/6.4.1/workbox-window.prod.mjs';
     const syncButton = document.getElementById('sync');
     if ('serviceWorker' in navigator) {
+      console.log('Registering Service Worker...');
       const wb = new Workbox('sw.js', {
         type: 'module',
       });
@@ -39,7 +40,36 @@
         await registration.sync.register('TRIGGER_SYNC');
         // await wb.messageSW({ type: 'TRIGGER_SYNC' });
       });
+      navigator.serviceWorker.ready.then(registration => {
+        if (registration.periodicSync) {
+          // Periodic Background Sync is supported.
+          const status = navigator.permissions.query({ name: 'periodic-background-sync' })
+            .then(status => {
+              console.log({ status });
+              if (status.state === 'granted') {
+                const interval = 15 * 1000;
 
+                console.log(`Registering PeriodicSync every ${interval/1000} seconds`);
+                // Periodic background sync can be used.
+                return registration.periodicSync.register(
+                  'PERIODIC_SYNC', {
+                  minInterval: interval,
+                });
+              } else {
+                // Periodic background sync cannot be used.
+                return Promise.reject('No permission!');
+              }
+            }).catch(error => {
+              console.error({ error });
+            });
+
+        } else {
+          // Periodic Background Sync isn't supported.
+        }
+      });
+
+    } else {
+      console.log('Service Worker not supported...');
     }
   </script>
 </body>

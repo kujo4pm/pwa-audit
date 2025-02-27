@@ -1,5 +1,5 @@
 import express from 'express';
-// import bodyParser from 'body-parser';
+import patientJson from '../pwa/assets/patient.fhir.json' with { type: "json" };
 
 const FRONT_END_ROOT = '/pwa';
 const FRONT_END_DIR = './pwa';
@@ -18,7 +18,7 @@ app.use(FRONT_END_ROOT, express.static(FRONT_END_DIR));
 const SERVER_PORT = '8080'
 console.log('Starting server...');
 app.post('/api', express.json(), (req, res) => {
-  const { body, method, headers } = req;
+  const { body, method } = req;
   console.log({ method, body });
   res.setHeader('Content-Type', 'application/json');
   res.status(200);
@@ -27,6 +27,21 @@ app.post('/api', express.json(), (req, res) => {
   });
 });
 
+app.get('/api/patient', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.status(200);
+  console.log('Sending new records from server');
+  res.send({
+    recordCount: 1,
+    records: [
+      {
+        id: `${patientJson.id}_${Date.now()}`,
+        isSynchronized: Date.now(),
+        payload: patientJson,
+      }
+    ]
+  });
+});
 app.listen(SERVER_PORT, () => {
   console.log(`Example app listening on port ${SERVER_PORT}`)
 });
