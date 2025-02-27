@@ -83,16 +83,31 @@ async function saveText() {
   catch (e) {
     showResult("Error while saving data to DB: " + e.message);
   }
+}
 
+// Using https://github.com/jakearchibald/idb
+async function getData() {
+  const tx = await db.transaction(SYNC_QUEUE_TABLE, 'readonly')
+  const store = tx.objectStore(SYNC_QUEUE_TABLE);
+  // Because in our case the `id` is the key, we would
+  // have to know in advance the value of the id to
+  // retrieve the record
+  const value = await store.get('example_1740648580874');
+  // const value = await store.getAll();
+  console.log({ value })
 
 }
 
 const createButton = document.getElementById('create');
 const sendButton = document.getElementById('send');
+const syncButton = document.getElementById('sync');
 const inputField = document.getElementById('json-input');
 const form = document.getElementById('json-to-send');
+
 createButton.addEventListener("click", createDB);
 sendButton.addEventListener("click", saveText);
+syncButton.addEventListener("click", getData);
+
 function showResult(text) {
   document.querySelector("output").innerHTML = text;
 }
