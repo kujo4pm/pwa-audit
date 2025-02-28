@@ -14,6 +14,7 @@ app.use((req, res, next) => {
   next();
 });
 app.use(FRONT_END_ROOT, express.static(FRONT_END_DIR));
+app.use('/favicon.ico', express.static('./favicon.ico'));
 
 const SERVER_PORT = '8080'
 console.log('Starting server...');

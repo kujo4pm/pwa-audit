@@ -38,7 +38,6 @@ self.addEventListener('sync', event => {
   if (event.tag === 'TRIGGER_SYNC') {
     console.log('message received by service worker');
     event.waitUntil(sendUnsynchronized());
-    event.ports[0].postMessage(SYNC_COMPLETE_MESSAGE);
   }
 });
 
@@ -72,9 +71,6 @@ self.addEventListener('fetch', event => {
 
     // Get the resource from the cache.
     const cachedResponse = await cache.match(event.request);
-    const { status } = cachedResponse;
-    console.log({ status });
-    console.log({ eventRequest: event.request });
     if (cachedResponse) {
       return cachedResponse;
     } else {
