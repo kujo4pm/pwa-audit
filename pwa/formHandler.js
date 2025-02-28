@@ -6,7 +6,7 @@ import { createDB, saveRecord } from './database.js';
 const response = fetch('./assets/patient.fhir.json')
   .then(res => res.json())
   .then(patientJson => {
-    inputField.value = JSON.stringify(patientJson);
+    inputField.value = JSON.stringify(patientJson, null, 2);
   });
 
 async function saveText() {
